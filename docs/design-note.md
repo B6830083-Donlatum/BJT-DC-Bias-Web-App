@@ -97,3 +97,4 @@ static/style.css        ← หน้าตา/responsive
 | แยก `validate_inputs` ออกจาก `parse_form` | `parse_form(form) → (BiasInputs \| None, errors)` + `validate_inputs(BiasInputs) → errors` | spec §7 เขียนรวมเป็นฟังก์ชันเดียว แต่การแยกทำให้แปลงหน่วย/แปลงชนิด กับตรวจช่วงค่า ทดสอบแยกกันได้ — ผลลัพธ์เทียบเท่า |
 | ค่า `nan` / `inf` | ปฏิเสธด้วย "ต้องเป็นจำนวนจำกัด" | `float("nan")` แปลงผ่านและ `nan <= 0` เป็น False จึงต้องตรวจ `math.isfinite()` แยก |
 | `VB` ในช่วง Cutoff | ใช้ `VB = VTH` | ไม่มีกระแสเบส → เบสอยู่ที่แรงดัน Thévenin; `VE + VBE` ใช้ได้เฉพาะ Forward Active |
+| ให้ agent merge + push แทนผู้ใช้ | ทำแทนตามคำสั่งผู้ใช้ (2026-11-10) | กติกา AGENTS.md ข้อ 3 กำหนดให้ commit/push ผ่าน GitHub Desktop เท่านั้น แต่ผู้ใช้สั่งชัดเจนให้ agent ปิดงานให้ (Publish branch เสร็จแล้ว เหลือ merge เข้า `main`) จึงทำแทนเป็นกรณีพิเศษครั้งเดียว และบันทึกไว้ตามข้อ 5 — งาน commit หลัก (`cab5583`) ผู้ใช้ยังทำเองใน GitHub Desktop |

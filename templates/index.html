@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT DC Bias Calculator — Voltage Divider</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="hero">
+  <h1>BJT Common-Emitter DC Bias</h1>
+  <p>วงจรขยายแบบ Voltage-Divider Bias · คำนวณ DC Operating Point ด้วย Python Backend</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>1. กรอกค่าอุปกรณ์</h2>
+    <form method="post" action="{{ url_for('calculate') }}">
+      <div class="grid">
+        <label class="field">
+          <span>VCC <em>[V]</em></span>
+          <input type="number" step="any" name="vcc" value="{{ form.get('vcc', '12') }}" required>
+        </label>
+
+        {% for name, label, hint in resistors %}
+        <label class="field">
+          <span>{{ label }} <em>({{ hint }})</em></span>
+          <div class="unit-row">
+            <input type="number" step="any" name="{{ name }}" value="{{ form.get(name, '') }}" required>
+            <select name="{{ name }}_unit">
+              <option value="kohm" {% if form.get(name ~ '_unit', 'kohm') == 'kohm' %}selected{% endif %}>kΩ</option>
+              <option value="ohm" {% if form.get(name ~ '_unit', 'kohm') == 'ohm' %}selected{% endif %}>Ω</option>
+            </select>
+          </div>
+        </label>
+        {% endfor %}
+
+        <label class="field">
+          <span>β (h<sub>FE</sub>)</span>
+          <input type="number" step="any" name="beta" value="{{ form.get('beta', '100') }}" required>
+        </label>
+
+        <label class="field">
+          <span>VBE <em>[V]</em></span>
+          <input type="number" step="any" name="vbe" value="{{ form.get('vbe', '0.70') }}" required>
+        </label>
+      </div>
+
+      <button type="submit">Calculate DC Bias</button>
+    </form>
+  </section>
+
+  {% if errors %}
+  <section class="card alert error">
+    <h2>พบข้อผิดพลาดในข้อมูลนำเข้า</h2>
+    <ul>
+      {% for message in errors %}<li>{{ message }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if warnings %}
+  <section class="card alert warning">
+    <h2>คำเตือน</h2>
+    <ul>
+      {% for message in warnings %}<li>{{ message }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if result %}
+  <section class="card">
+    <h2>2. DC Operating Point</h2>
+    <p class="region">
+      <span class="badge {{ result.region }}">{{ result.region|upper }}</span>
+      {% if result.region == 'active' %}แบบจำลอง Forward-Active ใช้ได้ในช่วงนี้{% endif %}
+    </p>
+
+    <div class="results">
+      <div class="result"><span>VB</span><strong>{{ result.vb|fmt }} V</strong></div>
+      <div class="result"><span>VE</span><strong>{{ result.ve|fmt }} V</strong></div>
+      <div class="result"><span>VC</span><strong>{{ result.vc|fmt }} V</strong></div>
+      <div class="result"><span>VCE</span><strong>{{ result.vce|fmt }} V</strong></div>
+      <div class="result"><span>IC</span><strong>{{ (result.ic * 1000)|fmt }} mA</strong></div>
+    </div>
+
+    <table>
+      <caption>ค่าประกอบการคำนวณ</caption>
+      <tbody>
+        <tr><th>IB</th><td>{{ (result.ib * 1e6)|fmt }} µA</td></tr>
+        <tr><th>IE</th><td>{{ (result.ie * 1000)|fmt }} mA</td></tr>
+        <tr><th>VTH</th><td>{{ result.vth|fmt }} V</td></tr>
+        <tr><th>RTH</th><td>{{ (result.rth / 1000)|fmt }} kΩ</td></tr>
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+</main>
+
+<footer>
+  ENG29 2121 · Lab 02 · Forward-Active approximation (β คงที่, VBE คงที่) — ไม่ใช่ SPICE
+</footer>
+</body>
+</html>
